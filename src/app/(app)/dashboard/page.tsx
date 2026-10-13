@@ -29,7 +29,7 @@ export default async function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-            Welcome back, {profile?.full_name?.split(' ')[0] || 'User'} 👋
+            Welcome back, {profile?.full_name || 'User'} {profile?.role === 'administrator' ? '(Admin)' : ''} 👋
           </h1>
           <p className="text-sm text-slate-500 mt-1">
             Here is what is happening across your organization&apos;s shared resources today.

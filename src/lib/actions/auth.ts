@@ -67,7 +67,7 @@ export async function signOut(): Promise<void> {
   redirect('/login');
 }
 
-export async function getCurrentProfile() {
+export async function getCurrentProfile(): Promise<Profile | null> {
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -79,5 +79,13 @@ export async function getCurrentProfile() {
     .eq('id', user.id)
     .single();
 
-  return profile;
+  if (profile) return profile;
+
+  // Fallback to auth metadata if profile row hasn't synced yet
+  return {
+    id: user.id,
+    full_name: (user.user_metadata?.full_name as string) || user.email?.split('@')[0] || 'User',
+    role: 'employee',
+    created_at: user.created_at,
+  };
 }

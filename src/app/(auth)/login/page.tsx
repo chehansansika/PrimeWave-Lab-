@@ -38,8 +38,7 @@ export default function LoginPage() {
     try {
       const result = await signIn(formData);
       if (result.success) {
-        router.push('/dashboard');
-        router.refresh();
+        window.location.href = '/dashboard';
       } else {
         setError(result.message);
       }

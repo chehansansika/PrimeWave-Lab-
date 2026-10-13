@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import type { ActionResponse } from '@/types';
 
 export async function signUp(formData: FormData): Promise<ActionResponse> {
@@ -55,12 +56,14 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
     return { success: false, message: error.message };
   }
 
+  revalidatePath('/', 'layout');
   return { success: true, message: 'Logged in successfully' };
 }
 
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
   redirect('/login');
 }
 

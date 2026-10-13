@@ -32,19 +32,22 @@ export function Header({ profile, onMobileMenuToggle }: HeaderProps) {
 
       {/* User profile and action buttons */}
       <div className="flex items-center gap-4">
-        {profile && (
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
-              <User className="w-4 h-4" />
-            </div>
-            <div className="hidden sm:flex flex-col text-right">
-              <span className="text-sm font-semibold text-slate-800 leading-tight">
-                {profile.full_name || 'Organization Member'}
-              </span>
-              <span className="text-xs text-slate-500 capitalize">{profile.role}</span>
-            </div>
+        <div className="flex items-center gap-2.5" suppressHydrationWarning>
+          <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold text-xs uppercase shadow-sm">
+            {profile?.full_name?.charAt(0) || <User className="w-4 h-4" />}
           </div>
-        )}
+          <div className="flex flex-col text-right">
+            <span className="text-xs font-semibold text-slate-800 leading-tight">
+              {profile?.full_name || 'User'}
+              {profile?.role === 'administrator' && (
+                <span className="ml-1 text-[11px] font-bold text-blue-600">(Admin)</span>
+              )}
+            </span>
+            <span className="text-[10px] text-slate-400 capitalize">
+              {profile?.role === 'administrator' ? 'Administrator' : 'Employee'}
+            </span>
+          </div>
+        </div>
 
         {/* Sign Out Button */}
         <form action={signOut}>

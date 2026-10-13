@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import type { ActionResponse } from '@/types';
 
 export async function signUp(formData: FormData): Promise<ActionResponse> {
@@ -55,26 +56,41 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
     return { success: false, message: error.message };
   }
 
+  revalidatePath('/', 'layout');
   return { success: true, message: 'Logged in successfully' };
 }
 
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
   redirect('/login');
 }
 
-export async function getCurrentProfile() {
+export async function getCurrentProfile(): Promise<Profile | null> {
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
-  return profile;
+  if (error) {
+    console.error('[getCurrentProfile] Error fetching profile:', error.message, error.code);
+  }
+
+  if (profile) return profile;
+
+  // Fallback to auth metadata if profile row hasn't synced yet
+  console.warn('[getCurrentProfile] No profile found for user', user.id, '- using fallback');
+  return {
+    id: user.id,
+    full_name: (user.user_metadata?.full_name as string) || user.email?.split('@')[0] || 'User',
+    role: 'employee',
+    created_at: user.created_at,
+  };
 }

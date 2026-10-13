@@ -73,15 +73,20 @@ export async function getCurrentProfile(): Promise<Profile | null> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
+  if (error) {
+    console.error('[getCurrentProfile] Error fetching profile:', error.message, error.code);
+  }
+
   if (profile) return profile;
 
   // Fallback to auth metadata if profile row hasn't synced yet
+  console.warn('[getCurrentProfile] No profile found for user', user.id, '- using fallback');
   return {
     id: user.id,
     full_name: (user.user_metadata?.full_name as string) || user.email?.split('@')[0] || 'User',

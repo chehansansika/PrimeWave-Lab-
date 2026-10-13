@@ -32,7 +32,7 @@ export function Header({ profile, onMobileMenuToggle }: HeaderProps) {
 
       {/* User profile and action buttons */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5" suppressHydrationWarning>
           <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold text-xs uppercase shadow-sm">
             {profile?.full_name?.charAt(0) || <User className="w-4 h-4" />}
           </div>
